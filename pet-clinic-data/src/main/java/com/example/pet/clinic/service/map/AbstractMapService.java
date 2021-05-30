@@ -1,23 +1,31 @@
 package com.example.pet.clinic.service.map;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.example.pet.clinic.model.BaseEntity;
 
-public abstract class AbstractMapService<T,ID> {
+import java.util.*;
 
-    protected Map<ID,T> map = new HashMap<>();
+public abstract class AbstractMapService<T extends BaseEntity,ID extends  Long> {
+
+    protected Map<Long,T> map = new HashMap<>();
 
     T findById(ID  id)
     {
         return map.get(id);
     }
 
-    T save(ID id, T object)
+    T save(T object) throws RuntimeException
     {
-        map.put(id,object);
-        return object;
+        if (object != null)
+        {
+
+            if (object.getId() == null)
+                object.setId(nextId());
+
+            map.put(object.getId(), object);
+            return object;
+        }
+        throw new RuntimeException("you pass null object");
+
     }
 
     Set<T> findAll()
@@ -33,6 +41,20 @@ public abstract class AbstractMapService<T,ID> {
     void deleteById(ID id)
     {
         map.remove(id);
+    }
+
+    private long nextId()
+    {
+        long nextId = 1;
+        try {
+            nextId = Collections.max(map.keySet()) +1;
+        }catch (Exception ignored)
+        {
+
+        }
+
+        return nextId;
+
     }
 
 }

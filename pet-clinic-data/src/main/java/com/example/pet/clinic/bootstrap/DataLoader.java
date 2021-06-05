@@ -1,10 +1,8 @@
 package com.example.pet.clinic.bootstrap;
 
 import com.example.pet.clinic.model.*;
-import com.example.pet.clinic.service.PetTypeService;
-import com.example.pet.clinic.service.SpecialitiesService;
-import com.example.pet.clinic.service.map.OwnerServiceMap;
-import com.example.pet.clinic.service.map.VetServiceMap;
+import com.example.pet.clinic.service.*;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -12,16 +10,19 @@ import java.time.LocalDate;
 
 @Component
 public class DataLoader implements CommandLineRunner {
-    private final OwnerServiceMap ownerServiceMap;
-    private final VetServiceMap vetServiceMap;
+    private final OwnerService ownerService;
+    private final VetService vetService;
     private final PetTypeService petTypeServiceMap;
     private final SpecialitiesService specialitiesService;
+    private final VisitService visitService;
 
-    public DataLoader(OwnerServiceMap ownerServiceMap, VetServiceMap vetServiceMap, PetTypeService petTypeServiceMap, SpecialitiesService specialitiesService) {
-        this.ownerServiceMap = ownerServiceMap;
-        this.vetServiceMap = vetServiceMap;
+    public DataLoader(OwnerService ownerService, VetService vetService, PetTypeService petTypeServiceMap,
+                      SpecialitiesService specialitiesService, VisitService visitService) {
+        this.ownerService = ownerService;
+        this.vetService = vetService;
         this.petTypeServiceMap = petTypeServiceMap;
         this.specialitiesService = specialitiesService;
+        this.visitService = visitService;
     }
 
     @Override
@@ -45,6 +46,8 @@ public class DataLoader implements CommandLineRunner {
         cat = new PetType();
         cat.setName("cat");
         PetType catSaveType = petTypeServiceMap.save(cat);
+
+
 
         Speciality radiology,surgery,dentistry;
         radiology = new Speciality();
@@ -71,6 +74,8 @@ public class DataLoader implements CommandLineRunner {
         owner2Pet.setPetType(catSaveType);
         owner2Pet.setBirthDate(LocalDate.now());
 
+
+
         Owner owner1,owner2;
 
 
@@ -82,7 +87,7 @@ public class DataLoader implements CommandLineRunner {
         owner1.setTelephone("099999999");
         owner1Pet.setOwner(owner1);
         owner1.getPets().add(owner1Pet);
-        ownerServiceMap.save(owner1);
+        ownerService.save(owner1);
 
         owner2 = new Owner();
         owner2.setFirstName("mike");
@@ -92,7 +97,16 @@ public class DataLoader implements CommandLineRunner {
         owner2.setTelephone("098888888");
         owner2Pet.setOwner(owner2);
         owner2.getPets().add(owner2Pet);
-        ownerServiceMap.save(owner2);
+        ownerService.save(owner2);
+
+
+        Visit visitCat = new Visit();
+        visitCat.setDescription("some one visit this cat");
+        visitCat.setDate(LocalDate.now());
+        visitCat.setPet(owner2Pet);
+
+        visitService.save(visitCat);
+
 
         System.out.println("Loaded owners ");
         Vet vet1,vet2;
@@ -102,14 +116,14 @@ public class DataLoader implements CommandLineRunner {
         vet1.setFirstName("lora");
         vet1.setLastName("carry");
         vet1.getSpecialities().add(savedRadiology);
-        vetServiceMap.save(vet1);
+        vetService.save(vet1);
 
         vet2 = new Vet();
         vet2.setFirstName("ramin");
         vet2.setLastName("rowshan");
         vet1.getSpecialities().add(savedSurgery);
 
-        vetServiceMap.save(vet2);
+        vetService.save(vet2);
 
         System.out.println("loaded vets");
     }
